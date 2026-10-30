@@ -1,0 +1,14 @@
+{
+  "name": "agentic-review",
+  "description": "The agentic-review plugin for Claude Code.",
+  "owner": {
+    "name": "Henry Castro"
+  },
+  "plugins": [
+    {
+      "name": "agentic-review",
+      "source": "./",
+      "description": "Review a change until it is ready to merge: lens reviewers, a refuter per finding, fix rounds, and a fix-check after every round."
+    }
+  ]
+}
