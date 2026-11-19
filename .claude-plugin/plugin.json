@@ -1,11 +1,16 @@
 {
   "name": "agentic-review",
-  "version": "0.1.0",
-  "description": "Review a change until it is ready to merge: lens reviewers, a refuter per finding, fix rounds, and a fix-check after every round.",
+  "version": "0.2.0",
+  "description": "Review a change until it is ready to merge, at a depth that scales with the change: light, standard or full. Only findings that break what ships block a release, and the rest goes on a follow-up list.",
   "author": {
     "name": "Henry Castro"
   },
   "repository": "https://github.com/hcastro/agentic-review",
   "license": "MIT",
-  "keywords": ["code-review", "review-loop", "subagents", "skill"]
+  "keywords": [
+    "code-review",
+    "review-loop",
+    "subagents",
+    "skill"
+  ]
 }

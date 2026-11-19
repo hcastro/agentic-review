@@ -6,6 +6,9 @@
 {
   "piece": "archive-idle",
   "base": "main",
+  "depth": "standard",
+  "shippedState": "archiver on, idle hold enabled",
+  "roundBudget": 1,
   "fixRounds": 2,
   "reviews": 1,
   "fixChecks": 2,
@@ -18,6 +21,7 @@
       "title": "Idle hold survives a restart and blocks the next session",
       "severity": "major",
       "raisedSeverity": "blocker",
+      "blocking": true,
       "file": "apps/archiver/src/idle.ts",
       "line": 88,
       "lenses": ["correctness", "failure"],
@@ -57,14 +61,16 @@
 
 | Status | Meaning | Counts as open |
 |---|---|---|
-| `open` | Confirmed and waiting for a fix round | yes |
+| `open` | Confirmed, blocking, and waiting for a fix round | yes |
 | `fixed` | A fix-check ruled it fixed | no |
 | `rejected-ok` | The implementer rejected it and the fix-check upheld the rejection; route the requirement to its owner | no |
 | `refuted` | A refuter disproved it (for blockers and majors, with an executed check) | no |
 | `unverified` | A minor nobody could check here; reported, not fixed | no |
 | `escalated` | Failed its fix-check twice, or a pendulum; waiting on the owner | no, but blocks "done" |
-| `deferred` | Confirmed, and the owner chose not to fix it now | no, listed in the report |
+| `deferred` | Confirmed, new, and not blocking: it does not break the state that ships, or the owner chose not to fix it now | no, it goes on the follow-up list |
 | `backlog` | Confirmed and pre-existing on the base (`"base": "pre-existing"`), or a late-round minor the owner agreed to leave; outside the fix rounds | no, listed in the report |
+
+`blocking` is set at triage and is a separate question from severity. A major in a state that is not being shipped has `blocking: false` and status `deferred`. Give each deferred finding a `followUp` line saying when it should be done, such as "before the switch is turned on".
 
 ## Fields added for scope and pacing
 
@@ -77,8 +83,9 @@
 One line per decision, so a reader can replay the loop:
 
 ```
-s1 review: 5 lenses, 14 proposals, 9 distinct, 7 confirmed (2 major), 2 refuted. -> fix round 1 (7 items)
-s2 fix-check: 6/7 fixed, 1 partial, 1 major regression (G2.1, mirror of F1.3). R2 pendulum -> owner decides hold expiry vs reconnect
-owner: expire holds only on boot, never on reconnect. Added to brief decisions.
-s3 fix-check: 2/2 fixed, 0 regressions, gates pass. R8 -> ship, waiting for merge approval
+frame: depth standard (shared path, ships on), budget 1 round
+s1 review: 4 lenses, 14 proposals, 9 distinct, 7 confirmed (2 major), 2 refuted. Triage: 2 blocking, 5 deferred. -> fix round 1 (2 items)
+s2 fix-check: 1/2 fixed, 1 partial, 1 regression that blocks (G2.1, mirror of F1.3). R2 pendulum -> owner decides hold expiry vs reconnect
+owner: expire holds only on boot, never on reconnect, and one more round. Added to brief decisions.
+s3 fix-check: 2/2 fixed, nothing blocking, gates pass. R4 -> ship, waiting for merge approval. Follow-up list: 5 items
 ```

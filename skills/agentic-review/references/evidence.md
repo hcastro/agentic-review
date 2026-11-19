@@ -40,6 +40,21 @@ Case-study numbers come from a four-day project (GameCast, Oct 14 to 18, 2026): 
 - Confirmed findings per review stayed between 7 and 19 across a 39-fold range of change size (248 to 9,650 lines). A large change gets sampled.
 - Human review limits agree: reviewers stop finding defects past about 400 lines per sitting and 500 lines per hour (SmartBear/Cisco); Google's median change is 24 lines.
 
+## Depth, blocking and budgets
+
+A later run, one night on a personal agent runtime (Nov 19, 2026): one feature that shipped switched off, then a fix to a live permission path. The loop ran from an installed copy of this skill that was two days behind this repository, with one depth, every confirmed finding fixed, and rounds repeated until a fix-check was clean.
+
+- **Most fixed findings did not affect what shipped.** The feature took two full reviews, four fix rounds and four fix-checks, about four hours and 6.3M subagent tokens. 42 findings were fixed. One of them affected the switched-off state that was deployed. Hence the blocking rule and the state that ships.
+- **Coverage gaps dominate the majors.** A tests lens that removes guards one at a time reported the survivors as findings. Eight of the ten majors across the two reviews were guards with no test, in code that behaved correctly. Hence the cap of five and the default of deferring them.
+- **Each round has a fixed cost that the finding count hides.** Every fix round reran the full suite on two machines, and each round on the permission fix reran 20 to 80 live model runs. Hence one round by default, fast checks during rounds, and the full suite once.
+- **A second full review produces a second list.** The re-review after two fix rounds found nothing in the shipped state and 13 new items for the unshipped one. Hence no automatic re-review.
+- **A mechanism designed inside a fix round is unreviewed design.** A fix round on the permission change added a new host check that was not in the brief. Two of the next review's major findings were holes in that check, and the check after that found three more in the mechanisms added to close them. Hence the rule that a fix needing a new mechanism becomes its own piece.
+- **Serial work idles everything else.** One implementer session carried every piece, so three planned design notes waited eight hours behind one review loop. Hence design and build for other pieces running while a review is open.
+- **Offline cases hid a live failure.** Five model-behavior cases shipped after offline validation only. Live, the feature passed one or two runs in three. Hence the gotcha that a model-dependent case counts only after a live run.
+- **Reviewers wrote into the live checkout twice.** The stale copy had no `scratch.sh`. Each time a `cd` into a scratch path failed because `$TMPDIR` differs between sandboxed and unsandboxed commands, and the next write landed in the main checkout. Hence the gotchas about a scratch path that moves and a stale installed copy.
+
+What the heavy loop did buy: the one finding that mattered for the shipped state (tools advertised on attachment messages while the feature was off) was found by two lenses in the first review, and a rebuilt-base comparison proved the switched-off state unchanged. A standard-depth review would have found both.
+
 ## What the loop missed
 
 Four defects reached the owner after reviewed code merged, within about 36 hours:
@@ -56,7 +71,7 @@ Hence the deployed smoke test, the design-fidelity lens and mechanical guards.
 A second run, Oct 27 to 28, 2026: a terminal app (`branch-review`) reviewed as one piece across the whole repo, three fix rounds, Claude subagents as implementers in four parallel file-ownership groups. The change grew from about 8,500 to 14,000 changed lines. About 130 agents ran in total, over three usage windows.
 
 - **It never converged, and scope was the main reason.** Confirmed findings per review ran 51, then about 59, then about 30. Each fix round fixed most of what it got (32 of 51 fully in round 1, 62 of 63 in round 2), and each re-review found a new layer. At least six confirmed findings were pre-existing on the base (a delta line-length cut, non-UTF-8 contents and names, header-only files, a debounce that starves). With no backlog rule they became fix-round items and widened the next round. Hence the `base` label, the backlog status and the late-round minor rule (R7).
-- **Drift fired every round.** Each round added a new mechanism in one area (a forked refresh process, a native watcher, an asynchronous refresh), so R4 bought three full reviews and the cheap fix-check never ran alone. Hence R4a.
+- **Drift fired every round.** Each round added a new mechanism in one area (a forked refresh process, a native watcher, an asynchronous refresh), so the drift rule of the time bought three full reviews and the cheap fix-check never ran alone. The rule today is R3: a fix that needs a new mechanism stops the round and becomes its own piece.
 - **The refresh limit was a three-round pendulum** (fixed timeout, then a no-progress limit, then gaps in that limit's progress reports). R2 fired only on the third regression. Hence the pendulum-candidate flag.
 - **Severity drifted upward.** "A minor that breaks an invariant is a major", applied to seven broad invariants, promoted about ten rare-input findings (a whole-second file system, a relative TMPDIR, a file named like the range). Refuters downgraded many majors the other way. Hence "realistic scenario".
 - **Refuters mostly confirmed.** 74 refuters ran across two reviews; 4 refuted outright and a few narrowed a claim. Most of the minors they confirmed already carried an executed reproduction from the lens. Hence `executed-by-lens`.

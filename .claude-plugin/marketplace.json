@@ -8,7 +8,7 @@
     {
       "name": "agentic-review",
       "source": "./",
-      "description": "Review a change until it is ready to merge: lens reviewers, a refuter per finding, fix rounds, and a fix-check after every round."
+      "description": "Review a change until it is ready to merge, at a depth that scales with the change: light, standard or full. Only findings that break what ships block a release, and the rest goes on a follow-up list."
     }
   ]
 }

@@ -19,6 +19,15 @@ Fill the `<...>` slots. Paste the brief's purpose paragraph and invariants into 
 ## Risk tags
 <unattended | public | security | ground-truth | prototype | none>
 
+## Depth
+<light | standard | full>, because <one line: size, what it touches, whether it ships on>.
+
+## State that ships
+<What is live after the release: the feature on, the feature off behind a default, a migration applied. Blocking is judged against this.>
+
+## Round budget
+<1 fix round and 1 fix-check, unless the owner set another number.>
+
 ## Decisions already made
 - <Design choice the fix must not reopen, with the reason.>
 
@@ -108,6 +117,8 @@ The code is in <snapshot>/tree. Treat it as read-only. The full change against <
 
 <machine rules>
 
+The state that ships: <state>. Say for each finding whether it breaks that state.
+
 Report only real, evidenced issues. Each finding: title, severity (blocker, major, minor), file, line, evidence, scenario (the steps that make it fail), fix, a reproduction when you have one (say whether you ran it and quote the output), and whether the base has the same behavior (new or pre-existing) when you can tell. Style nits are out of scope. Never copy a secret value into a finding. An empty list is a fine answer.
 
 Your lens: <lens text>
@@ -118,9 +129,11 @@ Default lenses:
 - **correctness:** The behavior the change promises, edge cases, ordering, idempotency, concurrency, data loss, and whether existing behavior is preserved for every caller.
 - **failure:** Swallowed or rewritten errors, the real reason thrown away, unbounded retries, silent hangs, state that never recovers after a transient fault, cleanup on every exit path, and what an operator sees when it breaks. Logs must never carry secrets.
 - **safety and security:** Validation at trust boundaries, authentication and authorization, injection, path and origin handling, secrets in code, logs or responses, data shown to people who should not see it, and anything that could disturb the running system or the machines it runs on.
-- **tests and design:** Whether each test can fail when the behavior it claims breaks: mocks of the unit under test, assertions that pass on the initial state, unawaited async assertions, gates that always pass, fixtures the real system cannot produce, claimed behavior with no test. Design only where the structure makes a likely next change harder or hides a defect; name that next change. "Could be cleaner" is out of scope.
+- **tests and design:** Whether each test can fail when the behavior it claims breaks: mocks of the unit under test, assertions that pass on the initial state, unawaited async assertions, gates that always pass, fixtures the real system cannot produce, claimed behavior with no test. Design only where the structure makes a likely next change harder or hides a defect; name that next change. "Could be cleaner" is out of scope. Report at most five coverage gaps: the ones that guard an invariant in the state that ships, ranked. List any others in one line each under "also untested", without a severity.
 
-Extra lenses (pick up to two from the risk tags and the diff, and name the files where the risk lives):
+Light depth uses correctness and tests only. Standard and full use all four.
+
+Extra lenses (full depth only; pick up to two from the risk tags and the diff, and name the files where the risk lives):
 
 - **timing and state:** state machines under flapping or transient inputs, latches, budgets, reconnects, restart recovery, clocks and timeouts. Back claims with a run where possible (a fake clock, a stress loop).
 - **blast radius:** shared helpers, middleware or config whose change reaches callers outside the feature; changed error, exit or status contracts.
@@ -133,7 +146,7 @@ Extra lenses (pick up to two from the risk tags and the diff, and name the files
 - **design fidelity** (required when an approved prototype exists): compare the built result to the prototype, state by state. Screenshots side by side where possible.
 - **merge** (required when the change contains a merge): behavior from both sides survives; docs, runbooks or config that now contradict each other; tests the merge left unable to fail; stale budgets, thresholds or fixtures; conflict resolutions that silently dropped one side.
 
-Re-review addendum (append to every lens prompt after the first review):
+Re-review addendum (a second full review happens only when the owner asks for one or the change now contains a merge; append this to every lens prompt then):
 
 ```
 This is a re-review after fix rounds. Weight what fixes tend to break: failure reporting (the real reason thrown away), state machines under flapping or transient inputs, changes to shared helpers and to error, exit or status contracts, and tests that can no longer fail.
@@ -145,7 +158,7 @@ Do not re-report open, fixed, rejected-ok or escalated ones unless you have evid
 
 ## Refuter
 
-One per distinct defect. Give it the claim, not the lens's argument:
+One per defect that needs a refuter under step 4 of SKILL.md, and none at light depth. Give it the claim, not the lens's argument:
 
 ```
 You are checking one claimed defect in a code change. <Purpose paragraph>
@@ -200,7 +213,9 @@ Rules for this round:
 - For each item, write a test that fails before your fix and passes after it, where a test is possible. Show the red run and the green run.
 - Never weaken, delete, skip or loosen an existing assertion or fixture to make a test pass. If one is wrong, say why and change only that.
 - Change nothing the items do not need. If a fix goes through a shared helper, list every caller and say why each is still right.
+- If a fix seems to need a new mechanism (a new check with its own rules, a new stored field, a new authorization path, a new process or protocol), stop and say so in the report. Do not build it in this round.
 - If a fix adds an exception, latch, guard, timeout or retry to satisfy one requirement, add a test for the opposite requirement too.
+- Run the fast checks for the changed area. The full suite runs once, on the commit that ships.
 - Kill only processes whose pid your test or probe recorded; never by name or pattern. Remove only paths you created.
 - <commit policy, stated once>
 
@@ -223,11 +238,11 @@ Run these checks and fix what fails:
 Write your report to <piece-dir>/reports/fix-<n>.md using the report contract.
 ```
 
-A fenced round (rule R7) adds one line at the top: "Fix only the items below. Change nothing else."
+The items in a fix prompt are the blocking ones. Deferred findings stay in the ledger and go to the owner as the follow-up list. When the owner later asks for the follow-up list to be worked, send it as its own fenced round with one line at the top: "Fix only the items below. Change nothing else."
 
 ## Fix-check
 
-One agent per 8 items (at least two), each with its own item group:
+How many to launch: light depth, one checker and only when a blocker or major was fixed. Standard, one checker per 8 items. Full, one per 8 items and at least two. Each gets its own item group:
 
 ```
 You are verifying fix round <n> on <piece>: <purpose paragraph>
@@ -243,12 +258,12 @@ Check these items:
 <numbered items: n, id, severity, title, file:line, scenario, last check note>
 
 For each item decide: fixed; partial (say exactly what is left); not-fixed; rejected-ok (the rejection holds against the code and the stated requirements); rejected-wrong. If the item's test would still pass with the fix reverted, the item is partial; revert it in your scratch copy to find out when that is cheap.
-Then list any new real defect this round's changes introduced, with file:line evidence, the scenario, and the item number whose fix caused it. Defects that predate this round are out of scope. An empty list is fine.
+Then list any new real defect this round's changes introduced, with file:line evidence, the scenario, and the item number whose fix caused it. Say for each whether it breaks the state that ships (<state>). Defects that predate this round are out of scope. An empty list is fine.
 ```
 
 ## Hunt
 
-One regression hunter per fix-check, with the same opening as the fix-check and the list of items the round targeted:
+One regression hunter per fix-check at full depth, and at standard depth when the round changed shared code. It gets the same opening as the fix-check and the list of items the round targeted:
 
 ```
 Hunt only for defects this round's changes introduced. Work through these in order; fixes broke things these ways before:
@@ -257,7 +272,7 @@ Hunt only for defects this round's changes introduced. Work through these in ord
 3. Mirror failures: for every new exception, latch, guard, timeout or budget added to satisfy one requirement, check the opposite requirement still holds. A guard that blocks a false trigger must not block the real one.
 4. Test integrity: every changed or deleted test, fixture or assertion needs a reason. Flag weakened assertions, new skips, mocks of the unit under test, unawaited async assertions, and tests that pass on the initial state.
 5. Coverage claims: try to break each claim in the report that something is covered or can never happen.
-Report each regression with file:line evidence, the scenario, severity, and the item number whose fix caused it. An empty list is fine.
+Report each regression with file:line evidence, the scenario, severity, the item number whose fix caused it, and whether it breaks the state that ships. An empty list is fine.
 ```
 
 ## Resume
