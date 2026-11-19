@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>agentic-review figures</title>
+<!-- Source for the figures in the README. Each <svg data-name="x"> is rendered to
+     docs/img/x-light.webp and docs/img/x-dark.webp by render.cjs in this folder. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap">
+<style>
+  :root {
+    --bg: #FBF8F3; --panel: #FFFFFF; --ink: #1B1A17; --ink2: #57524A; --ink3: #8C867B;
+    --line: #E4DED2; --line2: #CDC5B5;
+    --red: #D4442A; --red-s: #FBE7E0;
+    --green: #1E7B5F; --green-s: #DDF1E9;
+    --amber: #B4761A; --amber-s: #F9EDD3;
+    --blue: #3B4CC0; --blue-s: #E5E8FB;
+  }
+  :root[data-theme="dark"] {
+    --bg: #161513; --panel: #1F1D1A; --ink: #F3EFE7; --ink2: #BBB4A7; --ink3: #878074;
+    --line: #2F2C27; --line2: #4A453D;
+    --red: #FF7F61; --red-s: #3A1F18;
+    --green: #62D2AE; --green-s: #15302A;
+    --amber: #EFB95C; --amber-s: #382B13;
+    --blue: #9CA8FF; --blue-s: #22264C;
+  }
+  html, body { margin: 0; background: transparent; }
+  body { padding: 24px; display: grid; gap: 28px; justify-items: start; }
+  svg[data-name] { display: block; width: 1200px; height: auto; }
+
+  .bg { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+  .title { font: 600 34px "Fraunces", Georgia, serif; fill: var(--ink); letter-spacing: -0.012em; }
+  .sub { font: 400 16px "DM Sans", sans-serif; fill: var(--ink2); }
+  .name { font: 600 15px "DM Sans", sans-serif; fill: var(--ink); }
+  .cap { font: 500 10.5px "DM Mono", monospace; fill: var(--ink3); letter-spacing: .09em; }
+  .body { font: 400 14px "DM Sans", sans-serif; fill: var(--ink2); }
+  .small { font: 400 13px "DM Sans", sans-serif; fill: var(--ink2); }
+  .val { font: 500 14.5px "DM Sans", sans-serif; fill: var(--ink); }
+  .chip { font: 500 13px "DM Sans", sans-serif; fill: var(--ink2); }
+  .hcard { font: 600 26px "Fraunces", Georgia, serif; fill: var(--ink); letter-spacing: -0.01em; }
+  .big { font: 600 34px "Fraunces", Georgia, serif; fill: var(--ink); letter-spacing: -0.01em; }
+  .mid { text-anchor: middle; } .end { text-anchor: end; }
+
+  .f-ink { fill: var(--ink); } .f-ink2 { fill: var(--ink2); } .f-ink3 { fill: var(--ink3); }
+  .f-red { fill: var(--red); } .f-green { fill: var(--green); } .f-amber { fill: var(--amber); } .f-blue { fill: var(--blue); }
+  .f-panel { fill: var(--panel); } .f-bg { fill: var(--bg); } .f-line { fill: var(--line); }
+  .f-red-s { fill: var(--red-s); } .f-amber-s { fill: var(--amber-s); } .f-green-s { fill: var(--green-s); } .f-blue-s { fill: var(--blue-s); }
+  .s-ink { stroke: var(--ink); } .s-ink3 { stroke: var(--ink3); } .s-line { stroke: var(--line); } .s-line2 { stroke: var(--line2); }
+  .s-red { stroke: var(--red); } .s-green { stroke: var(--green); } .s-amber { stroke: var(--amber); } .s-blue { stroke: var(--blue); }
+  .e { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .thin { stroke-width: 1.6; }
+  .hair { fill: none; stroke: var(--line); stroke-width: 1; }
+  .dots { stroke-dasharray: 0.1 6; stroke-linecap: round; stroke-width: 1.8; }
+  .dash { stroke-dasharray: 6 6; }
+  .node { stroke-width: 2.2; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="5.4" markerHeight="5.4" orient="auto-start-reverse">
+      <path d="M1.4 1.2 L8.6 5 L1.4 8.8" fill="none" stroke="context-stroke" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+
+<!-- ───────────────────────── 1. The loop ───────────────────────── -->
+<svg data-name="loop" viewBox="0 0 1200 650" xmlns="http://www.w3.org/2000/svg">
+  <rect class="bg" x="0.5" y="0.5" width="1199" height="649" rx="24"/>
+  <text class="title" x="48" y="72">One review, one fix round, then it ships.</text>
+  <text class="sub" x="48" y="102">The default path through the loop. A finding sends the change back only when it breaks what ships.</text>
+
+  <!-- owner lane -->
+  <text class="cap" x="48" y="146">OWNER</text>
+  <path class="e dots s-ink3" d="M90 186 L90 244"/>
+  <path class="e dots s-ink3" d="M930 186 L930 234"/>
+  <path class="e dots s-ink3" d="M1110 186 L1110 238"/>
+  <rect class="f-panel s-line2" x="48" y="156" width="214" height="28" rx="14" stroke-width="1"/>
+  <text class="chip" x="64" y="175">sets goal, invariants, depth</text>
+  <rect class="f-panel s-line2" x="826" y="156" width="208" height="28" rx="14" stroke-width="1"/>
+  <text class="chip mid" x="930" y="175">decides when budget is spent</text>
+  <rect class="f-panel s-line2" x="1066" y="156" width="88" height="28" rx="14" stroke-width="1"/>
+  <text class="chip mid" x="1110" y="175">approves</text>
+
+  <!-- main line -->
+  <path class="e s-ink" d="M112 270 L196 270" marker-end="url(#arr)"/>
+  <path class="e s-ink" d="M242 270 L326 270" marker-end="url(#arr)"/>
+  <path class="e s-ink" d="M372 270 L456 270" marker-end="url(#arr)"/>
+  <path class="e s-ink" d="M502 270 L540 270"/>
+  <path class="e thin s-blue" d="M540 270 C578 270 584 234 625 234 C666 234 672 270 710 270"/>
+  <path class="e thin s-blue" d="M540 270 C578 270 584 258 625 258 C666 258 672 270 710 270"/>
+  <path class="e thin s-blue" d="M540 270 C578 270 584 282 625 282 C666 282 672 270 710 270"/>
+  <path class="e thin s-blue" d="M540 270 C578 270 584 306 625 306 C666 306 672 270 710 270"/>
+  <path class="e s-ink" d="M710 270 L756 270" marker-end="url(#arr)"/>
+  <path class="e s-ink" d="M802 270 L895 270" marker-end="url(#arr)"/>
+  <path class="e s-green" d="M962 270 L1079 270" marker-end="url(#arr)"/>
+  <path class="e thin dash s-amber" d="M956 252 C996 214 1050 214 1088 250" marker-end="url(#arr)"/>
+  <text class="cap mid f-amber" x="1022" y="214">DEFERRED</text>
+  <text class="cap mid f-green" x="1020" y="294">NOTHING BLOCKS</text>
+
+  <!-- fix ring -->
+  <path class="e s-red" d="M946.5 301.4 A95 95 0 0 1 1024.3 406.6" marker-end="url(#arr)"/>
+  <path class="e s-red" d="M1009.7 446.7 A95 95 0 0 1 951.4 487.6" marker-end="url(#arr)"/>
+  <path class="e s-red" d="M908.6 487.6 A95 95 0 0 1 850.3 446.7" marker-end="url(#arr)"/>
+  <path class="e s-red" d="M835.7 406.6 A95 95 0 0 1 913.5 301.4" marker-end="url(#arr)"/>
+  <text class="mid f-red" x="930" y="412" style="font:600 58px Fraunces, Georgia, serif">1</text>
+  <text class="cap mid f-red" x="930" y="436">ROUND BY DEFAULT</text>
+
+  <!-- nodes -->
+  <circle class="node f-panel s-ink" cx="90" cy="270" r="20"/>
+  <circle class="f-ink" cx="220" cy="270" r="20"/>
+  <circle class="node f-panel s-ink" cx="350" cy="270" r="20"/>
+  <circle class="node f-panel s-ink" cx="480" cy="270" r="20"/>
+  <circle class="f-blue" cx="625" cy="234" r="7"/><circle class="f-blue" cx="625" cy="258" r="7"/>
+  <circle class="f-blue" cx="625" cy="282" r="7"/><circle class="f-blue" cx="625" cy="306" r="7"/>
+  <circle class="f-blue" cx="780" cy="270" r="20"/>
+  <circle class="node f-panel s-ink" cx="930" cy="270" r="30" stroke-width="2.6"/>
+  <path class="e s-ink" d="M930 256 L930 270 M930 270 L919 281 M930 270 L941 281" stroke-width="2.4"/>
+  <circle class="f-green" cx="1110" cy="270" r="26"/>
+  <path class="e" d="M1098 271 L1107 280 L1123 261" stroke="var(--bg)" stroke-width="3.2"/>
+  <circle class="f-ink" cx="1019" cy="427" r="15"/>
+  <circle class="node f-panel s-ink" cx="930" cy="490" r="15"/>
+  <circle class="f-blue" cx="841" cy="427" r="15"/>
+
+  <!-- labels -->
+  <text class="name mid" x="90" y="342">Frame</text><text class="cap mid" x="90" y="360">THE BRIEF</text>
+  <text class="name mid" x="220" y="342">Build</text><text class="cap mid" x="220" y="360">TEST FIRST</text>
+  <text class="name mid" x="350" y="342">Gates</text><text class="cap mid" x="350" y="360">CHECKS YOU RUN</text>
+  <text class="name mid" x="480" y="342">Snapshot</text><text class="cap mid" x="480" y="360">FROZEN TREE</text>
+  <text class="name mid" x="625" y="342">Review</text><text class="cap mid" x="625" y="360">LENSES IN PARALLEL</text>
+  <text class="name mid" x="780" y="342">Refute</text><text class="cap mid" x="780" y="360">DISPROVE IT</text>
+  <text class="name end" x="888" y="234">Triage</text><text class="cap end" x="888" y="250">AND DECIDE</text>
+  <text class="name mid" x="1110" y="342">Ship</text><text class="cap mid f-amber" x="1110" y="360">+ FOLLOW-UP LIST</text>
+  <text class="name" x="1044" y="424">Fix round</text><text class="cap" x="1044" y="442">WHAT BLOCKS</text>
+  <text class="name mid" x="930" y="530">Snapshot</text><text class="cap mid" x="930" y="548">FREEZE THE FIX</text>
+  <text class="name end" x="816" y="424">Fix-check</text><text class="cap end" x="816" y="442">RULE ON EACH FIX</text>
+
+  <!-- legend -->
+  <g transform="translate(48 606)">
+    <circle class="f-panel s-ink" cx="8" cy="-4" r="7" stroke-width="2"/><text class="small" x="24" y="0">Orchestrator, your session</text>
+    <circle class="f-ink" cx="222" cy="-4" r="7.5"/><text class="small" x="238" y="0">Implementer</text>
+    <circle class="f-blue" cx="348" cy="-4" r="7.5"/><text class="small" x="364" y="0">Fresh subagents</text>
+    <path class="e s-red" d="M494 -4 L522 -4"/><text class="small" x="532" y="0">Blocking path</text>
+  </g>
+</svg>
+
+<!-- ───────────────────────── 2. Why it is sized ───────────────────────── -->
+<svg data-name="one-in-42" viewBox="0 0 1200 470" xmlns="http://www.w3.org/2000/svg">
+  <rect class="bg" x="0.5" y="0.5" width="1199" height="469" rx="24"/>
+  <text class="title" x="48" y="72">42 findings fixed. One affected what shipped.</text>
+  <text class="sub" x="48" y="102">One night on a feature that shipped switched off, reviewed with one depth, no blocking rule and no budget.</text>
+
+  <g id="grid42"></g>
+  <path class="e thin s-red" d="M262 266 L262 318"/>
+  <circle class="f-red" cx="262" cy="318" r="3"/>
+  <text class="val f-red" x="274" y="323" style="font-weight:600">1 broke the switched-off state that was deployed</text>
+  <text class="body" x="49" y="356">41 were real defects in a state nobody was shipping yet.</text>
+  <text class="body" x="49" y="378">8 of the 10 majors were guards with no test, in code that behaved correctly.</text>
+
+  <path class="hair" d="M650 148 L650 392"/>
+  <text class="cap" x="690" y="160">WHAT THAT REVIEW COST</text>
+  <text class="big end" x="790" y="212">4 h</text><text class="body" x="810" y="208">in the review loop</text>
+  <text class="big end" x="790" y="260">2</text><text class="body" x="810" y="256">full reviews</text>
+  <text class="big end" x="790" y="308">4</text><text class="body" x="810" y="304">fix rounds, each with a full suite run</text>
+  <text class="big end" x="790" y="356">4</text><text class="body" x="810" y="352">fix-checks</text>
+  <text class="big end" x="790" y="404">6.3M</text><text class="body" x="810" y="400">subagent tokens</text>
+
+  <text class="small" x="49" y="432">Two rules came out of it. Only a finding that breaks the shipped state blocks, and the default budget is one fix round.</text>
+</svg>
+
+<!-- ───────────────────────── 3. Depth ───────────────────────── -->
+<svg data-name="depth" viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg">
+  <rect class="bg" x="0.5" y="0.5" width="1199" height="639" rx="24"/>
+  <text class="title" x="48" y="72">Depth scales with the change.</text>
+  <text class="sub" x="48" y="102">Start from the lightest depth that fits. The owner can ask for more at any point.</text>
+
+  <!-- Light -->
+  <rect class="f-panel s-line" x="48" y="130" width="356" height="418" rx="18"/>
+  <text class="hcard" x="74" y="178">Light</text>
+  <rect class="f-blue" x="336" y="162" width="12" height="12" rx="3"/><rect class="f-line" x="352" y="162" width="12" height="12" rx="3"/><rect class="f-line" x="368" y="162" width="12" height="12" rx="3"/>
+  <text class="small" x="74" y="206">Docs, tests, small ordinary code,</text>
+  <text class="small" x="74" y="225">a change behind an off switch</text>
+  <path class="hair" d="M74 244 L378 244"/>
+  <text class="cap" x="74" y="270">REVIEW</text>
+  <circle class="f-panel s-ink" cx="84" cy="292" r="8.5" stroke-width="2"/><circle class="f-blue" cx="112" cy="292" r="9.5"/><circle class="f-blue" cx="140" cy="292" r="9.5"/>
+  <text class="small" x="162" y="297">diff read + 1 or 2 lenses</text>
+  <text class="cap" x="74" y="336">REFUTERS</text>
+  <text class="val" x="74" y="358">None. You check a major yourself.</text>
+  <text class="cap" x="74" y="398">FIX-CHECK</text>
+  <text class="val" x="74" y="420">One checker, only when a blocker</text>
+  <text class="val" x="74" y="439">or major was fixed</text>
+  <text class="cap" x="74" y="478">SUBAGENT TOKENS, TO SCALE</text>
+  <rect class="f-line" x="74" y="488" width="304" height="10" rx="5"/><rect class="f-blue" x="74" y="488" width="45.6" height="10" rx="5"/>
+  <text class="small" x="74" y="524">about 0.3M · a few minutes</text>
+
+  <!-- Standard -->
+  <rect class="f-panel s-line" x="422" y="130" width="356" height="418" rx="18"/>
+  <text class="hcard" x="448" y="178">Standard</text>
+  <rect class="f-blue" x="710" y="162" width="12" height="12" rx="3"/><rect class="f-blue" x="726" y="162" width="12" height="12" rx="3"/><rect class="f-line" x="742" y="162" width="12" height="12" rx="3"/>
+  <text class="small" x="448" y="206">Ordinary features, shared paths,</text>
+  <text class="small" x="448" y="225">ships switched on with limited risk</text>
+  <path class="hair" d="M448 244 L752 244"/>
+  <text class="cap" x="448" y="270">REVIEW</text>
+  <circle class="f-blue" cx="458" cy="292" r="9.5"/><circle class="f-blue" cx="486" cy="292" r="9.5"/><circle class="f-blue" cx="514" cy="292" r="9.5"/><circle class="f-blue" cx="542" cy="292" r="9.5"/>
+  <text class="small" x="564" y="297">4 lenses</text>
+  <text class="cap" x="448" y="336">REFUTERS</text>
+  <text class="val" x="448" y="358">Findings that would block</text>
+  <text class="cap" x="448" y="398">FIX-CHECK</text>
+  <text class="val" x="448" y="420">One checker per 8 fixed items,</text>
+  <text class="val" x="448" y="439">a hunter when shared code changed</text>
+  <text class="cap" x="448" y="478">SUBAGENT TOKENS, TO SCALE</text>
+  <rect class="f-line" x="448" y="488" width="304" height="10" rx="5"/><rect class="f-blue" x="448" y="488" width="152" height="10" rx="5"/>
+  <text class="small" x="448" y="524">about 1M · about 10 minutes</text>
+
+  <!-- Full -->
+  <rect class="f-panel s-line" x="796" y="130" width="356" height="418" rx="18"/>
+  <text class="hcard" x="822" y="178">Full</text>
+  <rect class="f-blue" x="1084" y="162" width="12" height="12" rx="3"/><rect class="f-blue" x="1100" y="162" width="12" height="12" rx="3"/><rect class="f-blue" x="1116" y="162" width="12" height="12" rx="3"/>
+  <text class="small" x="822" y="206">Security, unattended or public code</text>
+  <text class="small" x="822" y="225">that ships switched on, data migrations</text>
+  <path class="hair" d="M822 244 L1126 244"/>
+  <text class="cap" x="822" y="270">REVIEW</text>
+  <circle class="f-blue" cx="832" cy="292" r="9.5"/><circle class="f-blue" cx="860" cy="292" r="9.5"/><circle class="f-blue" cx="888" cy="292" r="9.5"/><circle class="f-blue" cx="916" cy="292" r="9.5"/>
+  <circle class="s-blue dash" cx="944" cy="292" r="8.5" fill="none" stroke-width="1.8" style="stroke-dasharray:3 3.4"/><circle class="s-blue" cx="972" cy="292" r="8.5" fill="none" stroke-width="1.8" style="stroke-dasharray:3 3.4"/>
+  <text class="small" x="994" y="297">4 lenses + up to 2</text>
+  <text class="cap" x="822" y="336">REFUTERS</text>
+  <text class="val" x="822" y="358">Every finding that needs one</text>
+  <text class="cap" x="822" y="398">FIX-CHECK</text>
+  <text class="val" x="822" y="420">At least two checkers,</text>
+  <text class="val" x="822" y="439">plus a regression hunter</text>
+  <text class="cap" x="822" y="478">SUBAGENT TOKENS, TO SCALE</text>
+  <rect class="f-blue" x="822" y="488" width="304" height="10" rx="5"/>
+  <text class="small" x="822" y="524">about 2M · 20 to 30 minutes</text>
+
+  <path class="e thin s-ink" d="M56 592 L56 578" marker-end="url(#arr)"/>
+  <text class="body" x="74" y="590">One level up for each: authorization, delivery, stored data or money · runs unattended · over about 600 changed lines</text>
+  <path class="e thin s-ink" d="M56 602 L56 616" marker-end="url(#arr)"/>
+  <text class="body" x="74" y="614">Usually one level down: a feature that ships switched off is reviewed for the switched-off state</text>
+</svg>
+
+<!-- ───────────────────────── 4. Triage ───────────────────────── -->
+<svg data-name="triage" viewBox="0 0 1200 530" xmlns="http://www.w3.org/2000/svg">
+  <rect class="bg" x="0.5" y="0.5" width="1199" height="529" rx="24"/>
+  <text class="title" x="48" y="72">Only what breaks the shipped state blocks a release.</text>
+  <text class="sub" x="48" y="102">Three questions decide where a finding goes. Everything confirmed keeps its evidence.</text>
+
+  <path class="e s-ink" d="M78 250 L271 250" marker-end="url(#arr)"/>
+  <path class="e s-ink" d="M322 250 L531 250" marker-end="url(#arr)"/>
+  <path class="e s-ink" d="M582 250 L791 250" marker-end="url(#arr)"/>
+  <path class="e s-red" d="M842 250 L973 250" marker-end="url(#arr)"/>
+  <path class="e thin s-ink3" d="M300 272 L300 333" marker-end="url(#arr)"/>
+  <path class="e thin s-ink3" d="M560 272 L560 333" marker-end="url(#arr)"/>
+  <path class="e thin s-amber" d="M820 272 L820 333" marker-end="url(#arr)"/>
+  <text class="cap mid" x="427" y="238">YES</text><text class="cap mid" x="687" y="238">YES</text><text class="cap mid f-red" x="908" y="238">YES</text>
+  <text class="cap" x="311" y="308">NO</text><text class="cap" x="571" y="308">NO</text><text class="cap f-amber" x="831" y="308">NO</text>
+
+  <circle class="f-ink" cx="70" cy="250" r="8"/>
+  <text class="name" x="48" y="218">A proposed finding</text>
+  <path class="node f-panel s-ink" d="M278 250 L300 228 L322 250 L300 272 Z" stroke-linejoin="round"/>
+  <path class="node f-panel s-ink" d="M538 250 L560 228 L582 250 L560 272 Z" stroke-linejoin="round"/>
+  <path class="node f-panel s-ink" d="M798 250 L820 228 L842 250 L820 272 Z" stroke-linejoin="round"/>
+  <text class="name mid" x="300" y="184">Does it survive</text><text class="name mid" x="300" y="204">a refuter?</text>
+  <text class="name mid" x="560" y="184">Did this change</text><text class="name mid" x="560" y="204">introduce it?</text>
+  <text class="name mid" x="820" y="184">Does it break the</text><text class="name mid" x="820" y="204">state that ships?</text>
+
+  <rect class="f-panel s-line2" x="190" y="340" width="220" height="94" rx="14"/>
+  <text class="hcard" x="212" y="376" style="font-size:21px">Refuted</text>
+  <text class="small" x="212" y="400">One line in the report.</text><text class="small" x="212" y="418">Nothing to fix.</text>
+  <rect class="f-panel s-line2" x="450" y="340" width="220" height="94" rx="14"/>
+  <text class="hcard" x="472" y="376" style="font-size:21px">Backlog</text>
+  <text class="small" x="472" y="400">The base behaves the same.</text><text class="small" x="472" y="418">Shown to the owner.</text>
+  <rect class="f-amber-s s-amber" x="710" y="340" width="220" height="94" rx="14" stroke-width="1.4"/>
+  <text class="hcard f-amber" x="732" y="376" style="font-size:21px">Deferred</text>
+  <text class="small" x="732" y="400">Goes on the follow-up list,</text><text class="small" x="732" y="418">with when to do it.</text>
+  <rect class="f-red-s s-red" x="980" y="200" width="172" height="100" rx="14" stroke-width="1.4"/>
+  <text class="hcard f-red" x="1000" y="238" style="font-size:21px">Blocking</text>
+  <text class="small" x="1000" y="262">Fixed in the round,</text><text class="small" x="1000" y="280">then fix-checked.</text>
+
+  <text class="body" x="48" y="480">Severity and blocking are separate questions. A major in a state that is not shipping is deferred.</text>
+  <text class="body" x="48" y="502">A minor that corrupts data in the shipped state blocks.</text>
+</svg>
+
+<!-- ───────────────────────── 5. Independence ───────────────────────── -->
+<svg data-name="independence" viewBox="0 0 1200 510" xmlns="http://www.w3.org/2000/svg">
+  <rect class="bg" x="0.5" y="0.5" width="1199" height="509" rx="24"/>
+  <text class="title" x="48" y="72">Fresh eyes, on purpose.</text>
+  <text class="sub" x="48" y="102">Every reviewer is a new subagent. Each gets what its job needs and nothing that would bias it.</text>
+
+  <g class="name mid" style="font-size:13.5px">
+    <text x="400" y="152">Frozen</text><text x="400" y="170">snapshot</text>
+    <text x="537" y="152">Purpose and</text><text x="537" y="170">invariants</text>
+    <text x="674" y="152">The finding</text><text x="674" y="170">under test</text>
+    <text x="811" y="152">Other reviewers'</text><text x="811" y="170">output</text>
+    <text x="948" y="152">Implementer's</text><text x="948" y="170">report</text>
+    <text x="1085" y="152">Build story,</text><text x="1085" y="170">PR text</text>
+  </g>
+  <path class="hair" d="M48 190 L1152 190" style="stroke:var(--line2)"/>
+  <path class="hair" d="M48 276 L1152 276"/><path class="hair" d="M48 362 L1152 362"/>
+
+  <text class="name" x="48" y="230">Lens reviewer</text><text class="cap" x="48" y="248">ONE PER LENS</text>
+  <text class="name" x="48" y="316">Refuter</text><text class="cap" x="48" y="334">ONE PER FINDING</text>
+  <text class="name" x="48" y="402">Fix-checker</text><text class="cap" x="48" y="420">ONE PER 8 FIXED ITEMS</text>
+
+  <!-- row 1 -->
+  <circle class="f-blue" cx="400" cy="230" r="11"/><circle class="f-blue" cx="537" cy="230" r="11"/>
+  <path class="e s-ink3" d="M666 230 L682 230"/>
+  <circle class="s-line2" cx="811" cy="230" r="10" fill="none" stroke-width="2"/><circle class="s-line2" cx="948" cy="230" r="10" fill="none" stroke-width="2"/><circle class="s-line2" cx="1085" cy="230" r="10" fill="none" stroke-width="2"/>
+  <!-- row 2 -->
+  <circle class="f-blue" cx="400" cy="316" r="11"/><circle class="f-blue" cx="537" cy="316" r="11"/><circle class="f-blue" cx="674" cy="310" r="11"/>
+  <text class="cap mid" x="674" y="340">THE CLAIM ONLY</text>
+  <circle class="s-line2" cx="811" cy="316" r="10" fill="none" stroke-width="2"/><circle class="s-line2" cx="948" cy="316" r="10" fill="none" stroke-width="2"/><circle class="s-line2" cx="1085" cy="316" r="10" fill="none" stroke-width="2"/>
+  <!-- row 3 -->
+  <circle class="f-blue" cx="400" cy="396" r="11"/><text class="cap mid" x="400" y="426">PLUS THE DELTA</text>
+  <circle class="f-blue" cx="537" cy="402" r="11"/><circle class="f-blue" cx="674" cy="396" r="11"/><text class="cap mid" x="674" y="426">ITS ITEMS</text>
+  <circle class="s-line2" cx="811" cy="402" r="10" fill="none" stroke-width="2"/>
+  <circle class="f-amber" cx="948" cy="396" r="11"/><text class="cap mid f-amber" x="948" y="426">DO NOT TRUST IT</text>
+  <circle class="s-line2" cx="1085" cy="402" r="10" fill="none" stroke-width="2"/>
+
+  <path class="hair" d="M48 448 L1152 448" style="stroke:var(--line2)"/>
+  <g transform="translate(48 482)">
+    <circle class="f-blue" cx="8" cy="-4" r="7.5"/><text class="small" x="24" y="0">Sees it</text>
+    <circle class="s-line2" cx="110" cy="-4" r="7" fill="none" stroke-width="2"/><text class="small" x="126" y="0">Never sees it</text>
+    <circle class="f-amber" cx="250" cy="-4" r="7.5"/><text class="small" x="266" y="0">Sees it, with the instruction to attack its claims first</text>
+  </g>
+</svg>
+
+<script>
+  // 42 dots: 14 columns by 3 rows. The one highlighted dot is the finding that affected the shipped state.
+  const g = document.getElementById('grid42'), ns = 'http://www.w3.org/2000/svg';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 14; c++) {
+    const d = document.createElementNS(ns, 'circle');
+    d.setAttribute('cx', 62 + c * 40); d.setAttribute('cy', 170 + r * 40); d.setAttribute('r', 13);
+    const hit = r === 2 && c === 5;
+    d.setAttribute('class', hit ? 'f-red' : 'f-line');
+    g.appendChild(d);
+  }
+</script>
+</body>
+</html>
