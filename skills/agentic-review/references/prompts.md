@@ -284,7 +284,7 @@ Report each regression with file:line evidence, the scenario, severity, the item
 ```markdown
 # Resume plan (<state>; window resets <HH:MM from date -r>)
 
-Running or paused (resume each with SendMessage to its id; a stopped subagent keeps its context):
+Running or paused (resume each by id where the harness can, as with SendMessage in Claude Code; otherwise restart it from its prompt file):
 <agent-id> <role> <worktree or snapshot> <items>
 
 Done this step: <groups or lenses that reported, with commits>

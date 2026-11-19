@@ -1,6 +1,6 @@
 # agentic-review
 
-A skill for Claude Code that reviews a change until it is ready to ship, and stops there.
+A review loop for coding agents. It takes a change until it is ready to ship, and stops there.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/loop-dark.webp">
@@ -22,6 +22,7 @@ The depth of the review is chosen up front and scales with the change. The defau
 - [Independent reviewers](#independent-reviewers)
 - [The rules that pick the next step](#the-rules-that-pick-the-next-step)
 - [What you get](#what-you-get)
+- [Works in any harness](#works-in-any-harness)
 - [Install](#install)
 - [Use](#use)
 - [Cost](#cost)
@@ -45,7 +46,7 @@ The other 41 were real defects in a state nobody was shipping yet. They belonged
 
 ## How the loop runs
 
-Your Claude Code session is the orchestrator. It writes every prompt, runs the checks itself, and keeps the state on disk. It never edits product code.
+Your agent session is the orchestrator. It writes every prompt, runs the checks itself, and keeps the state on disk. It never edits product code.
 
 | Step | Who | What happens |
 |---|---|---|
@@ -136,6 +137,28 @@ The loop's state lives in files, so a review that runs for days survives a resta
 
 After triage, and whenever you need to decide something, you get a short report: a verdict line with the rule that fired, the blocking items with their evidence, the follow-up list, the decisions waiting on you, and the totals so far.
 
+## Works in any harness
+
+The skill is a folder in the open [Agent Skills](https://agentskills.io/) format: instructions in `SKILL.md`, reference files, and shell scripts. Any agent that reads that format can run the loop.
+
+The loop asks four things of the harness: run shell commands, read and write files, start a fresh agent with a prompt, and wait for several at once. The third is the one that differs between tools, so the skill ships a launcher. `agent.sh` starts one fresh agent as a new process through an agent CLI and saves its final message:
+
+```sh
+bash skills/agentic-review/scripts/agent.sh codex prompts/lens-correctness.md reports/lens-correctness.md --dir "$copy"
+```
+
+| CLI | Launcher | Status |
+|---|---|---|
+| Claude Code | `agent.sh claude`, or the built-in Agent tool | Orchestrator in every run in the evidence file. Launcher run end to end |
+| Codex CLI | `agent.sh codex` | Implementer in two of the three runs. Launcher run end to end |
+| Cursor CLI | `agent.sh cursor` | Launcher run end to end |
+| opencode | `agent.sh opencode` | Launch command checked. No completed run yet |
+| Anything else | `agent.sh custom` | Set `AGENTIC_REVIEW_AGENT_CMD` to a command that reads the prompt on stdin |
+
+A new process has an empty context, which is what the independence rules ask for. The launcher also makes mixed reviews a one-line change: an orchestrator on one model family can send the second refutation of a serious finding to another family.
+
+The details for each harness are in [harnesses.md](skills/agentic-review/references/harnesses.md).
+
 ## Install
 
 As a Claude Code plugin:
@@ -152,16 +175,17 @@ claude plugin marketplace update agentic-review
 claude plugin update agentic-review@agentic-review
 ```
 
-As a plain skill, copy the folder into your skills directory:
+In any other harness, copy the folder into the directory where it looks for skills:
 
 ```sh
 git clone https://github.com/hcastro/agentic-review
-cp -R agentic-review/skills/agentic-review ~/.claude/skills/
+cp -R agentic-review/skills/agentic-review ~/.codex/skills/     # Codex CLI
+cp -R agentic-review/skills/agentic-review ~/.claude/skills/    # Claude Code without the plugin
 ```
 
 A copied skill does not update itself. Compare it with this repository before a long review.
 
-**Requirements:** `git`, an agent that can launch subagents (Claude Code's Agent tool), and an implementer: Codex CLI, a subagent in its own git worktree, or you. The repository's own checks must be runnable from the session.
+**Requirements:** `git`, a way to start fresh agents (your harness's subagent tool, or `agent.sh` with any agent CLI), and an implementer: Codex CLI, a subagent in its own git worktree, or you. The repository's own checks must be runnable from the session.
 
 ## Use
 
@@ -221,10 +245,12 @@ skills/agentic-review/
 ├── references/
 │   ├── prompts.md        templates for the brief, lenses, refuter, fix and fix-check
 │   ├── ledger.md         the ledger schema and statuses
+│   ├── harnesses.md      running the loop outside Claude Code
 │   └── evidence.md       the measurements behind each rule
 └── scripts/
     ├── snapshot.sh       freeze a checkout without touching it
     ├── scratch.sh        give one agent a cloned, runnable copy
+    ├── agent.sh          start one fresh agent through any agent CLI
     ├── mutate.sh         break lines one at a time and report what the tests catch
     ├── fakebin.sh        fake clipboard tools for probes
     ├── fake-tool.sh      a fake git or delta that records the processes it starts

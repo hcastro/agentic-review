@@ -9,9 +9,9 @@ One agent builds a small change. This session orchestrates: it runs the checks i
 
 The loop exists because fixing is where new defects come from. In the first case study, 95% of targeted findings were fixed, and 83% of fix rounds still introduced at least one new defect. The loop is sized because review has a cost that grows with every round. In a later case study, a feature that shipped switched off spent four hours in review, 42 findings were fixed, and one of them affected the state that shipped. The evidence for every rule here is in [references/evidence.md](references/evidence.md).
 
-**Requirements:** `git`, an agent that can launch subagents (Claude Code's Agent tool), and an implementer: Codex CLI, a subagent working in its own git worktree, or a person. The repo's own checks (tests, typecheck, build) must be runnable from this session.
+**Requirements:** `git`, a way to start fresh agents, and an implementer: Codex CLI, a subagent working in its own git worktree, or a person. Fresh agents come from the harness's own subagent tool (Claude Code's Agent tool, for example) or from `scripts/agent.sh`, which starts one from the shell through any agent CLI. The repo's own checks (tests, typecheck, build) must be runnable from this session. For a harness other than Claude Code, read [references/harnesses.md](references/harnesses.md) first.
 
-**The user's own rules win.** When the user's instructions (CLAUDE.md, memory, the request) set a depth, a round budget, a worktree location, a usage-limit policy, a writing style, approval rules for outward steps, or a naming policy, follow them. The defaults below apply only where the user has none.
+**The user's own rules win.** When the user's instructions (AGENTS.md, CLAUDE.md, memory, the request) set a depth, a round budget, a worktree location, a usage-limit policy, a writing style, approval rules for outward steps, or a naming policy, follow them. The defaults below apply only where the user has none.
 
 ## Depth
 
@@ -40,12 +40,12 @@ The owner can ask for a deeper review at any point. Never go deeper without aski
 
 These apply to every reviewer, refuter and fix-checker. They are what make several passes worth more than one.
 
-1. **Fresh subagents only.** Launch each with the Agent tool as a new general-purpose agent. Never use `fork`, which inherits this session's whole conversation, and never continue an earlier reviewer for a new round. A refuter that wrote the findings defends them.
+1. **Fresh subagents only.** Start each as a new agent with an empty context: the harness's subagent tool (in Claude Code, the Agent tool as a new general-purpose agent), or `scripts/agent.sh` from the shell. Never use a mode that inherits this session's conversation, such as Claude Code's `fork`, and never continue an earlier reviewer for a new round. A refuter that wrote the findings defends them.
 2. **No build story in the brief.** A reviewer gets the snapshot paths, the one-paragraph purpose, the invariants and the known-issues list. Leave out how the change was built, what you think of it, and the PR description or commit messages. Framing a change as safe cut vulnerability detection by 16 to 93 points in one study.
 3. **The implementer's report goes to the fix-check only.** Lens reviewers and refuters never see it. Fix-checkers get it with "do not trust it" and attack its coverage claims first.
 4. **Reviewers read a frozen snapshot**, never the live checkout. Make one with `scripts/snapshot.sh` before every review and every fix-check.
 5. **Read-only on code and machine.** Reviewers and checkers run probes only in their own copy from `scripts/scratch.sh`, which gives each agent one absolute path. No installs into shared folders, no edits, no git writes. They kill only processes whose pid they recorded (`scripts/fake-tool.sh` and `scripts/kill-recorded.sh`), never by name or pattern, and remove only paths they created. Probes that could reach a clipboard tool run behind `scripts/fakebin.sh`. These rules go in every reviewer, refuter and checker prompt word for word: other sessions share the machine.
-6. **Vary the reviewer.** When a second model family is available (Codex CLI, for example), use it for the second refutation of a high-severity claim. Models favor output that resembles their own.
+6. **Vary the reviewer.** When a second model family is available, use it for the second refutation of a high-severity claim. `scripts/agent.sh` starts a reviewer through another CLI (Claude Code, Codex, Cursor, opencode) in one command. Models favor output that resembles their own.
 
 Several pieces at once: run their loops in parallel when they touch different files. Design and build for one piece can run while another is in review. Never run two full reviews at the same time.
 
@@ -97,7 +97,7 @@ bash scripts/snapshot.sh <checkout> <base-ref> <piece-dir>/s<step> [--prev <piec
 
 This writes a frozen `tree/`, `change.patch` against the merge base (untracked files included), `delta.patch` since the previous snapshot, and `snapshot.json` with the commit, the file counts and whether a merge is involved. It never touches the checkout's index or working tree. Copying costs no model usage, so near a usage limit take the snapshot now and run the review after the reset. Take it before linking dependencies into the checkout, so the link is not in the patch.
 
-Each agent gets its runnable copy from `scripts/scratch.sh <snapshot> <agent-id> --deps <checkout>`: the tree plus the checkout's `node_modules`, cloned on APFS and reflink file systems, so a dozen agents don't each copy the dependency folder. Put the exact command in the agent's prompt. The same `scripts/` folder holds `mutate.sh` (break production lines one at a time and report caught or survived), `fakebin.sh` (fake clipboard tools) and `fake-tool.sh` with `kill-recorded.sh` (a fake git or delta that records its pids, and a kill that touches only those). Point agents at them so they don't write their own.
+Each agent gets its runnable copy from `scripts/scratch.sh <snapshot> <agent-id> --deps <checkout>`: the tree plus the checkout's `node_modules`, cloned on APFS and reflink file systems, so a dozen agents don't each copy the dependency folder. Put the exact command in the agent's prompt. The same `scripts/` folder holds `mutate.sh` (break production lines one at a time and report caught or survived), `fakebin.sh` (fake clipboard tools) and `fake-tool.sh` with `kill-recorded.sh` (a fake git or delta that records its pids, and a kill that touches only those). Point agents at them so they don't write their own. `agent.sh` is for the orchestrator: it starts one fresh agent through an agent CLI and saves its final message.
 
 ### 4. Review (lens reviewers, then refuters)
 
@@ -258,7 +258,7 @@ A second data point, a whole-repo sweep run with Claude subagents as implementer
 - **Cap concurrency at about 8 agents.** Tests, git and probes from 16 to 20 agents drove the load average to 20 to 46, and over 100 test runs timed out for load alone. Agents then spend their time classifying flakes.
 - **Gates under load:** run with a generous per-test timeout, and treat a timeout as a failure only after it repeats in an isolated rerun.
 - **Start big phases near the top of a usage window.** A fix round paused halfway costs a resume and leaves worktrees mid-edit. Near the user's threshold, take the snapshot and write the next phase's prompts, and launch after the reset.
-- **Pausing:** stop agents with TaskStop, write `RESUME.md`, and schedule one wake-up for just after the reset that checks the window really reset, restarts the watcher and resumes each agent by id with SendMessage. A stopped subagent keeps its context.
+- **Pausing:** stop the agents, write `RESUME.md`, and schedule one wake-up for just after the reset that checks the window really reset, restarts the watcher and resumes each agent. In Claude Code, stop with TaskStop and resume by id with SendMessage, and a stopped subagent keeps its context. An agent started with `agent.sh` starts again from its prompt file.
 - Before the first review, start the user's usage watcher if they have one. Re-arm it when it expires, and stop it when the loop ends.
 - Codex fix rounds don't count against this session's budget.
 
