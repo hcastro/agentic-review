@@ -1,6 +1,6 @@
 {
   "name": "agentic-review",
-  "description": "The agentic-review plugin for Claude Code.",
+  "description": "A review loop for coding agents, packaged as an Agent Skill.",
   "owner": {
     "name": "Henry Castro"
   },

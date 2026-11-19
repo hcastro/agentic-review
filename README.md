@@ -161,29 +161,27 @@ The details for each harness are in [harnesses.md](skills/agentic-review/referen
 
 ## Install
 
-As a Claude Code plugin:
+The skill is one folder. Copy it into the directory where your agent looks for skills:
+
+```sh
+git clone https://github.com/hcastro/agentic-review
+cp -R agentic-review/skills/agentic-review <your agent's skills folder>
+```
+
+| Agent | Skills folder |
+|---|---|
+| Codex CLI | `~/.codex/skills/` |
+| Claude Code | `~/.claude/skills/` |
+| Any other | Wherever it reads [Agent Skills](https://agentskills.io/) from. Check its docs |
+
+A copied skill does not update itself. Pull this repository and copy the folder again before a long review.
+
+The repository is also packaged as a plugin for agents with a plugin marketplace. In Claude Code:
 
 ```sh
 claude plugin marketplace add hcastro/agentic-review
 claude plugin install agentic-review@agentic-review
 ```
-
-To update it later:
-
-```sh
-claude plugin marketplace update agentic-review
-claude plugin update agentic-review@agentic-review
-```
-
-In any other harness, copy the folder into the directory where it looks for skills:
-
-```sh
-git clone https://github.com/hcastro/agentic-review
-cp -R agentic-review/skills/agentic-review ~/.codex/skills/     # Codex CLI
-cp -R agentic-review/skills/agentic-review ~/.claude/skills/    # Claude Code without the plugin
-```
-
-A copied skill does not update itself. Compare it with this repository before a long review.
 
 **Requirements:** `git`, a way to start fresh agents (your harness's subagent tool, or `agent.sh` with any agent CLI), and an implementer: Codex CLI, a subagent in its own git worktree, or you. The repository's own checks must be runnable from the session.
 
@@ -245,7 +243,7 @@ skills/agentic-review/
 ├── references/
 │   ├── prompts.md        templates for the brief, lenses, refuter, fix and fix-check
 │   ├── ledger.md         the ledger schema and statuses
-│   ├── harnesses.md      running the loop outside Claude Code
+│   ├── harnesses.md      how each harness starts agents, pauses and finds your rules
 │   └── evidence.md       the measurements behind each rule
 └── scripts/
     ├── snapshot.sh       freeze a checkout without touching it

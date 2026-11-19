@@ -1,6 +1,6 @@
 # Running the loop in any agent harness
 
-The loop is written as instructions and shell scripts. It needs four things from the harness that runs it. Read this when the orchestrator is not Claude Code, or when you want reviewers from a second model family.
+The loop is written as instructions and shell scripts. It needs four things from the harness that runs it. Read this before the first review in a harness, and when you want reviewers from a second model family.
 
 ## What the orchestrator needs
 
