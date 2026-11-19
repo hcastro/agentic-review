@@ -1,6 +1,6 @@
 {
   "name": "agentic-review",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Review a change until it is ready to merge, at a depth that scales with the change: light, standard or full. Only findings that break what ships block a release, and the rest goes on a follow-up list.",
   "author": {
     "name": "Henry Castro"

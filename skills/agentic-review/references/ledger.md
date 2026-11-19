@@ -4,10 +4,10 @@
 
 ```json
 {
-  "piece": "archive-idle",
+  "piece": "upload-resume",
   "base": "main",
   "depth": "standard",
-  "shippedState": "archiver on, idle hold enabled",
+  "shippedState": "resumable uploads on",
   "roundBudget": 1,
   "fixRounds": 2,
   "reviews": 1,
@@ -18,23 +18,23 @@
     {
       "id": "F1.3",
       "origin": "review",
-      "title": "Idle hold survives a restart and blocks the next session",
+      "title": "A resume token survives a restart and blocks the next upload",
       "severity": "major",
       "raisedSeverity": "blocker",
       "blocking": true,
-      "file": "apps/archiver/src/idle.ts",
+      "file": "src/upload/resume.ts",
       "line": 88,
       "lenses": ["correctness", "failure"],
       "base": "new",
-      "scenario": "Stream idles, archiver restarts, a new live segment arrives; the stale hold file is still present and the segment is dropped.",
-      "verdict": { "result": "confirmed", "reasonClass": "real-defect", "reason": "Traced load() at idle.ts:41; the hold is never expired on boot.", "ran": "bun test idle.restart.test.ts (fails)" },
+      "scenario": "An upload pauses, the service restarts, a new upload starts; the stale token file is still present and the first chunk is dropped.",
+      "verdict": { "result": "confirmed", "reasonClass": "real-defect", "reason": "Traced load() at resume.ts:41; the token is never expired on boot.", "ran": "npm test -- resume.restart.test.ts (fails)" },
       "status": "fixed",
       "attempts": 1,
       "failed": 0,
-      "group": "stale-hold",
+      "group": "stale-token",
       "history": [
         { "step": "s1", "event": "confirmed" },
-        { "step": "s2", "event": "fixed", "evidence": "idle.ts:44 expires holds older than the session; idle.restart.test.ts fails on s1, passes on s2" }
+        { "step": "s2", "event": "fixed", "evidence": "resume.ts:44 expires tokens older than the session; resume.restart.test.ts fails on s1, passes on s2" }
       ]
     },
     {
@@ -42,7 +42,7 @@
       "origin": "regression",
       "parent": "F1.3",
       "depth": 1,
-      "title": "Hold expiry also drops a valid hold during a 2 s reconnect",
+      "title": "Token expiry also drops a valid token during a 2 s reconnect",
       "severity": "major",
       "status": "open",
       "history": [{ "step": "s2", "event": "confirmed", "evidence": "mirror of F1.3: expiry runs on reconnect, not only on boot" }]
@@ -91,7 +91,7 @@ One line per decision, so a reader can replay the loop:
 ```
 frame: depth standard (shared path, ships on), budget 1 round
 s1 review: 4 lenses, 14 proposals, 9 distinct, 7 confirmed (2 major), 2 refuted. Triage: 2 blocking, 5 deferred. -> fix round 1 (2 items)
-s2 fix-check: 1/2 fixed, 1 partial, 1 regression that blocks (G2.1, mirror of F1.3). R2 pendulum -> owner decides hold expiry vs reconnect
-owner: expire holds only on boot, never on reconnect, and one more round. Added to brief decisions.
+s2 fix-check: 1/2 fixed, 1 partial, 1 regression that blocks (G2.1, mirror of F1.3). R2 pendulum -> owner decides token expiry vs reconnect
+owner: expire tokens only on boot, never on reconnect, and one more round. Added to brief decisions.
 s3 fix-check: 2/2 fixed, nothing blocking, gates pass. R4 -> ship, waiting for merge approval. Follow-up list: 5 items
 ```

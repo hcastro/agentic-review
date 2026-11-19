@@ -1,6 +1,6 @@
 # Why the loop works this way
 
-Case-study numbers come from a four-day project (GameCast, Oct 14 to 18, 2026): 72 workflow runs, 17 full reviews, 18 checked fix rounds, 320 proposed findings. External results come from published papers and vendor write-ups. Sample sizes are small; treat thresholds as starting points to tune on your own repos.
+The loop's own numbers come from three runs on working codebases. The first and largest was a four-day build: 72 workflow runs, 17 full reviews, 18 checked fix rounds, 320 proposed findings. External results come from published papers and vendor write-ups. Sample sizes are small; treat thresholds as starting points to tune on your own repos.
 
 ## Independence
 
@@ -42,7 +42,7 @@ Case-study numbers come from a four-day project (GameCast, Oct 14 to 18, 2026): 
 
 ## Depth, blocking and budgets
 
-A later run, one night on a personal agent runtime (Nov 19, 2026): one feature that shipped switched off, then a fix to a live permission path. The loop ran from an installed copy of this skill that was two days behind this repository, with one depth, every confirmed finding fixed, and rounds repeated until a fix-check was clean.
+A later run, one night on a service that runs unattended: one feature that shipped switched off, then a fix to a live permission path. The loop ran from an installed copy of this skill that was two days behind this repository, with one depth, every confirmed finding fixed, and rounds repeated until a fix-check was clean.
 
 - **Most fixed findings did not affect what shipped.** The feature took two full reviews, four fix rounds and four fix-checks, about four hours and 6.3M subagent tokens. 42 findings were fixed. One of them affected the switched-off state that was deployed. Hence the blocking rule and the state that ships.
 - **Coverage gaps dominate the majors.** A tests lens that removes guards one at a time reported the survivors as findings. Eight of the ten majors across the two reviews were guards with no test, in code that behaved correctly. Hence the cap of five and the default of deferring them.
@@ -68,7 +68,7 @@ Hence the deployed smoke test, the design-fidelity lens and mechanical guards.
 
 ## Whole-repo sweep
 
-A second run, Oct 27 to 28, 2026: a terminal app (`branch-review`) reviewed as one piece across the whole repo, three fix rounds, Claude subagents as implementers in four parallel file-ownership groups. The change grew from about 8,500 to 14,000 changed lines. About 130 agents ran in total, over three usage windows.
+A second run, over two days: a terminal application reviewed as one piece across the whole repo, three fix rounds, Claude subagents as implementers in four parallel file-ownership groups. The change grew from about 8,500 to 14,000 changed lines. About 130 agents ran in total, over three usage windows.
 
 - **It never converged, and scope was the main reason.** Confirmed findings per review ran 51, then about 59, then about 30. Each fix round fixed most of what it got (32 of 51 fully in round 1, 62 of 63 in round 2), and each re-review found a new layer. At least six confirmed findings were pre-existing on the base (a delta line-length cut, non-UTF-8 contents and names, header-only files, a debounce that starves). With no backlog rule they became fix-round items and widened the next round. Hence the `base` label and the backlog status, which also takes late-round minors.
 - **Drift fired every round.** Each round added a new mechanism in one area (a forked refresh process, a native watcher, an asynchronous refresh), so the drift rule of the time bought three full reviews and the cheap fix-check never ran alone. The rule today is R3: a fix that needs a new mechanism stops the round and becomes its own piece.

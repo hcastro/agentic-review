@@ -198,7 +198,7 @@ Light review of my change before I commit.
 ```
 
 ```
-Codex finished the archiver piece. Review it until it is ready to merge.
+Codex finished the upload piece. Review it until it is ready to merge.
 ```
 
 The skill frames the piece first and confirms the brief with you, unless you have told it to carry on without stopping.
