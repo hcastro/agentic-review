@@ -51,6 +51,12 @@
 }
 ```
 
+## Top-level fields
+
+- `depth`, `shippedState`, `roundBudget`: copied from `brief.md` when the piece is framed.
+- `fixRounds`, `reviews`, `fixChecks`: counts so far. `fixRounds` above `roundBudget` means the owner granted a round under R6.
+- `sinceReview`: fix rounds since the last full review. `lastReviewSnapshot`: the snapshot that review read.
+
 ## Ids
 
 - `F<step>.<n>`: a review finding from the snapshot `s<step>` review.
@@ -66,7 +72,7 @@
 | `rejected-ok` | The implementer rejected it and the fix-check upheld the rejection; route the requirement to its owner | no |
 | `refuted` | A refuter disproved it (for blockers and majors, with an executed check) | no |
 | `unverified` | A minor nobody could check here; reported, not fixed | no |
-| `escalated` | Failed its fix-check twice, or a pendulum; waiting on the owner | no, but blocks "done" |
+| `escalated` | Still blocking when the round budget ran out (R6), or a pendulum (R2); waiting on the owner | no, but blocks "done" |
 | `deferred` | Confirmed, new, and not blocking: it does not break the state that ships, or the owner chose not to fix it now | no, it goes on the follow-up list |
 | `backlog` | Confirmed and pre-existing on the base (`"base": "pre-existing"`), or a late-round minor the owner agreed to leave; outside the fix rounds | no, listed in the report |
 

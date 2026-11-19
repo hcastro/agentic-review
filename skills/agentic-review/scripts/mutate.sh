@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Apply deliberate breaks to production code one at a time and report whether the
 # test command fails. Each file is restored after its run, and the clean baseline
 # runs last.

@@ -1,5 +1,7 @@
 # Prompt templates
 
+Contents: [Brief](#brief) · [Build](#build) · [Report](#report) · [Machine rules](#machine-rules) · [Lenses](#lenses) · [Refuter](#refuter) · [Fix](#fix) · [Fix-check](#fix-check) · [Hunt](#hunt) · [Resume](#resume)
+
 Fill the `<...>` slots. Paste the brief's purpose paragraph and invariants into every prompt. Keep the rest of the brief, the build story and your own opinion of the change out of reviewer and refuter prompts.
 
 ## Brief
